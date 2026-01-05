@@ -2,15 +2,27 @@
 
 use eframe::egui;
 
-fn main() -> eframe::Result<()>  {
+#[cfg(not(target_arch = "wasm32"))]
+fn main() -> eframe::Result<()> {
     eframe::run_native(
         "calculator-wasm-rust-pwa",
         eframe::NativeOptions::default(),
-        Box::new(|cc| {
-            let app = CalcApp::new(cc);
-            Ok(Box::new(app))
-        }),
+        Box::new(|cc| Ok(Box::new(CalcApp::new(cc)))), // <- Добавлено Ok()
     )
+}
+
+#[cfg(target_arch = "wasm32")]
+fn main() {
+    console_error_panic_hook::set_once();
+    wasm_bindgen_futures::spawn_local(async {
+        eframe::start_web(
+            "calculator-wasm-rust-pwa",
+            eframe::WebOptions::default(),
+            Box::new(|cc| Box::new(CalcApp::new(cc))), // Здесь тоже может понадобиться
+        )
+            .await
+            .expect("failed to start calculator-wasm-rust-pwa");
+    });
 }
 
 struct CalcApp {}
@@ -24,12 +36,41 @@ impl CalcApp {
 impl eframe::App for CalcApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.label(r#"  
-            Это вымышленный калькулятов.  
-            Чтобы воспользоваться калькулятором вам необходимо воспользоваться воображением.
-            Представте себе любой интерфейс, наберите в нем математическое выражение и нажмите '='.
-            Увидели результат, Да? - Поздравляю, ваш калькулятор работает хорошо.  
-            "#);
+            ui.horizontal(|ui| {
+                if ui.add_sized([58.0, 48.0], egui::Button::new("√").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("C").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("(").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new(")").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("<=").small()).clicked() {};
+            });
+            ui.horizontal(|ui| {
+                if ui.add_sized([58.0, 48.0], egui::Button::new("sin").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("7").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("8").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("9").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("*").small()).clicked() {};
+            });
+            ui.horizontal(|ui| {
+                if ui.add_sized([58.0, 48.0], egui::Button::new("cos").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("4").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("5").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("6").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("/").small()).clicked() {};
+            });
+            ui.horizontal(|ui| {
+                if ui.add_sized([58.0, 48.0], egui::Button::new("tg").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("1").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("2").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("3").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("-").small()).clicked() {};
+            });
+            ui.horizontal(|ui| {
+                if ui.add_sized([58.0, 48.0], egui::Button::new("ctg").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new(".").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("0").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("=").small()).clicked() {};
+                if ui.add_sized([58.0, 48.0], egui::Button::new("+").small()).clicked() {};
+            });
         });
     }
 }
